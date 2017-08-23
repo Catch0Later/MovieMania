@@ -1,0 +1,376 @@
+var Alexa = require('alexa-sdk');
+var request = require('request');
+
+exports.handler = function(event, context, callback){
+  var alexa = Alexa.handler(event, context);
+  //alexa.appId = 'amzn1.ask.skill.458a4a08-6764-4e37-9363-6d054ac4e645';
+
+//   if (event.session.user.accessToken == undefined) {
+//       alexa.emit(':tellWithLinkAccountCard','to start using this skill, please use the companion app to authenticate on Amazon');
+//          return;
+// }
+  
+  alexa.registerHandlers(handlers);
+  alexa.execute();
+};
+
+var handlers = {
+
+  'LaunchRequest': function () {
+    this.emit(':ask','Welcome to MovieMania!');
+  },
+  'TitleIntent': function () {
+    var movie = "Unknown";
+
+        if (this.event.request.intent.slots.Movie) {
+            movie = this.event.request.intent.slots.Movie.value;
+        } else if (this.event.request.intent.slots.Series) {
+            movie = this.event.request.intent.slots.Series.value;
+        }
+        movie = encodeURIComponent(movie);
+        var api_key = 'd1acfc3f'; //ENTER API KEY HERE
+
+        var endpoint = 'http://www.omdbapi.com/?s=' + movie +'&apikey=d1acfc3f';
+        
+        request.get(endpoint, (error, response, body) => {
+            if(response.statusCode !== 200) {
+                this.emit(':tell','There was an error processing your request. Here\'s what happened: ' +
+                                    response.statusCode + ' ' + response.statusMessage);
+            } else {
+            data = JSON.parse(body);
+
+            var MultipleMovies = data.Search;
+            this.attributes['MultipleMovies']= MultipleMovies;
+            MultipleMovies.sort(function(a,b) { //sorts the resulted movies
+                return parseFloat(a.Year) - parseFloat(b.Year);
+            });
+            var results = " "
+            if(MultipleMovies.length > 1) {
+                for (var x in MultipleMovies){
+                    results += ',' + MultipleMovies[x].Title + " " + MultipleMovies[x].Year + " ";
+            }
+                this.emit(':ask', 'Multiple movie results were found! Which would you like to hear about?' + results);
+            } else {
+                if(MultipleMovies.length == 1) {
+                    this.emit(':ask' , MultipleMovies[0].Title);
+                }
+            }  
+        }
+    })
+  },
+  'PlotIntent': function () {
+    var movie = "Unknown";
+
+    if (this.event.request.intent.slots.Movie) {
+        movie = this.event.request.intent.slots.Movie.value;
+    } else if (this.event.request.intent.slots.Series) {
+        movie = this.event.request.intent.slots.Series.value;
+    }
+    movie = encodeURIComponent(movie);
+    var api_key = 'd1acfc3f'; //ENTER API KEY HERE
+
+    var endpoint = 'http://www.omdbapi.com/?s=' + movie +'&apikey=d1acfc3f';
+    
+    request.get(endpoint, (error, response, body) => {
+        if(response.statusCode !== 200) {
+            this.emit(':tell','There was an error processing your request. Here\'s what happened: ' +
+                                response.statusCode + ' ' + response.statusMessage);
+        } else {
+          data = JSON.parse(body);
+
+          var actor = data.Plot;
+  
+          this.emit(':ask', actor);
+        }
+    });
+  },
+  'YearIntent': function () {
+    var movie = "Unknown";
+
+    if (this.event.request.intent.slots.Movie) {
+        movie = this.event.request.intent.slots.Movie.value;
+    } else if (this.event.request.intent.slots.Series) {
+        movie = this.event.request.intent.slots.Series.value;
+    }    
+    movie = encodeURIComponent(movie);
+    var api_key = 'd1acfc3f'; //ENTER API KEY HERE
+
+    var endpoint = 'http://www.omdbapi.com/?s=' + movie +'&apikey=d1acfc3f';
+    
+    request.get(endpoint, (error, response, body) => {
+        if(response.statusCode !== 200) {
+            this.emit(':tell','There was an error processing your request. Here\'s what happened: ' +
+                                response.statusCode + ' ' + response.statusMessage);
+        } else {
+          data = JSON.parse(body);
+
+          var year = data.Year;
+
+          this.emit(':ask', year);
+        }
+    });
+  },
+  'ActorIntent': function () {
+    var movie = "Unknown";
+
+    if (this.event.request.intent.slots.Movie) {
+        movie = this.event.request.intent.slots.Movie.value;
+    } else if (this.event.request.intent.slots.Series) {
+        movie = this.event.request.intent.slots.Series.value;
+    }
+    movie = encodeURIComponent(movie);
+    var api_key = 'd1acfc3f'; //ENTER API KEY HERE
+
+    var endpoint = 'http://www.omdbapi.com/?s=' + movie +'&apikey=d1acfc3f';
+    
+    request.get(endpoint, (error, response, body) => {
+        if(response.statusCode !== 200) {
+            this.emit(':tell','There was an error processing your request. Here\'s what happened: ' +
+                                response.statusCode + ' ' + response.statusMessage);
+        } else {
+          data = JSON.parse(body);
+
+          var actor = data.Actors;
+  
+          this.emit(':ask', actor);
+        }
+    });
+  },
+  'RatedIntent': function () {
+    var movie = "Unknown";
+
+    if (this.event.request.intent.slots.Movie) {
+        movie = this.event.request.intent.slots.Movie.value;
+    } else if (this.event.request.intent.slots.Series) {
+        movie = this.event.request.intent.slots.Series.value;
+    }
+    movie = encodeURIComponent(movie);
+    var api_key = 'd1acfc3f'; //ENTER API KEY HERE
+
+    var endpoint = 'http://www.omdbapi.com/?s=' + movie +'&apikey=d1acfc3f';
+    
+    request.get(endpoint, (error, response, body) => {
+        if(response.statusCode !== 200) {
+            this.emit(':tell','There was an error processing your request. Here\'s what happened: ' +
+                                response.statusCode + ' ' + response.statusMessage);
+        } else {
+          data = JSON.parse(body);
+
+          var rated = data.Rated;
+
+          this.emit(':ask', rated);
+        }
+    });
+  },
+  'ReleasedIntent': function () {
+    var movie = "Unknown";
+
+    if (this.event.request.intent.slots.Movie) {
+        movie = this.event.request.intent.slots.Movie.value;
+    } else if (this.event.request.intent.slots.Series) {
+        movie = this.event.request.intent.slots.Series.value;
+    }
+    movie = encodeURIComponent(movie);
+    var api_key = 'd1acfc3f'; //ENTER API KEY HERE
+
+    var endpoint = 'http://www.omdbapi.com/?s=' + movie +'&apikey=d1acfc3f';
+    
+    request.get(endpoint, (error, response, body) => {
+        if(response.statusCode !== 200) {
+            this.emit(':tell','There was an error processing your request. Here\'s what happened: ' +
+                                response.statusCode + ' ' + response.statusMessage);
+        } else {
+          data = JSON.parse(body);
+
+          var released = data.Released;
+
+          this.emit(':ask', released);
+        }
+    });
+  },
+  'GenreIntent': function () {
+    var movie = "Unknown";
+
+    if (this.event.request.intent.slots.Movie) {
+        movie = this.event.request.intent.slots.Movie.value;
+    } else if (this.event.request.intent.slots.Series) {
+        movie = this.event.request.intent.slots.Series.value;
+    }
+    movie = encodeURIComponent(movie);
+    var api_key = 'd1acfc3f'; //ENTER API KEY HERE
+
+    var endpoint = 'http://www.omdbapi.com/?s=' + movie +'&apikey=d1acfc3f';
+    
+    request.get(endpoint, (error, response, body) => {
+        if(response.statusCode !== 200) {
+            this.emit(':tell','There was an error processing your request. Here\'s what happened: ' +
+                                response.statusCode + ' ' + response.statusMessage);
+        } else {
+          data = JSON.parse(body);
+
+          var genre = data.Genre;
+
+          this.emit(':ask', genre);
+        }
+    });
+  },
+  'RatingsIntent': function () {
+    var movie = "Unknown";
+
+    if (this.event.request.intent.slots.Movie) {
+        movie = this.event.request.intent.slots.Movie.value;
+    } else if (this.event.request.intent.slots.Series) {
+        movie = this.event.request.intent.slots.Series.value;
+    }
+    movie = encodeURIComponent(movie);
+    var api_key = 'd1acfc3f'; //ENTER API KEY HERE
+
+    var endpoint = 'http://www.omdbapi.com/?s=' + movie +'&apikey=d1acfc3f';
+    
+    request.get(endpoint, (error, response, body) => {
+        if(response.statusCode !== 200) {
+            this.emit(':tell','There was an error processing your request. Here\'s what happened: ' +
+                                response.statusCode + ' ' + response.statusMessage);
+        } else {
+          data = JSON.parse(body);
+
+          var ratings = data.imdbRating;
+
+          this.emit(':ask', ratings);
+        }
+    });
+  },
+  'RuntimeIntent': function () {
+    var movie = "Unknown";
+
+    if (this.event.request.intent.slots.Movie) {
+        movie = this.event.request.intent.slots.Movie.value;
+    } else if (this.event.request.intent.slots.Series) {
+        movie = this.event.request.intent.slots.Series.value;
+    }
+    movie = encodeURIComponent(movie);
+    var api_key = 'd1acfc3f'; //ENTER API KEY HERE
+
+    var endpoint = 'http://www.omdbapi.com/?s=' + movie +'&apikey=d1acfc3f';
+    
+    request.get(endpoint, (error, response, body) => {
+        if(response.statusCode !== 200) {
+            this.emit(':tell','There was an error processing your request. Here\'s what happened: ' +
+                                response.statusCode + ' ' + response.statusMessage);
+        } else {
+          data = JSON.parse(body);
+
+          var runtime = data.Runtime;
+
+          this.emit(':ask', runtime);
+        }
+    });
+  },
+  'DirectorIntent': function () {
+    var movie = "Unknown";
+
+    if (this.event.request.intent.slots.Movie) {
+        movie = this.event.request.intent.slots.Movie.value;
+    } else if (this.event.request.intent.slots.Series) {
+        movie = this.event.request.intent.slots.Series.value;
+    }
+    movie = encodeURIComponent(movie);
+    var api_key = 'd1acfc3f'; //ENTER API KEY HERE
+
+    var endpoint = 'http://www.omdbapi.com/?s=' + movie +'&apikey=d1acfc3f';
+    
+    request.get(endpoint, (error, response, body) => {
+        if(response.statusCode !== 200) {
+            this.emit(':tell','There was an error processing your request. Here\'s what happened: ' +
+                                response.statusCode + ' ' + response.statusMessage);
+        } else {
+          data = JSON.parse(body);
+
+          var director = data.Director;
+
+          this.emit(':ask', director);
+        }
+    });
+  },
+  'WriterIntent': function () {
+    var movie = "Unknown";
+
+    if (this.event.request.intent.slots.Movie) {
+        movie = this.event.request.intent.slots.Movie.value;
+    } else if (this.event.request.intent.slots.Series) {
+        movie = this.event.request.intent.slots.Series.value;
+    }
+    movie = encodeURIComponent(movie);
+    var api_key = 'd1acfc3f'; //ENTER API KEY HERE
+
+    var endpoint = 'http://www.omdbapi.com/?s=' + movie +'&apikey=d1acfc3f';
+    
+    request.get(endpoint, (error, response, body) => {
+        if(response.statusCode !== 200) {
+            this.emit(':tell','There was an error processing your request. Here\'s what happened: ' +
+                                response.statusCode + ' ' + response.statusMessage);
+        } else {
+          data = JSON.parse(body);
+
+          var writer = data.Writer;
+
+          this.emit(':ask', writer);
+        }
+    });
+  },
+  'AwardsIntent': function () {
+    var movie = "Unknown";
+
+    if (this.event.request.intent.slots.Movie) {
+        movie = this.event.request.intent.slots.Movie.value;
+    } else if (this.event.request.intent.slots.Series) {
+        movie = this.event.request.intent.slots.Series.value;
+    }
+    movie = encodeURIComponent(movie);
+    var api_key = 'd1acfc3f'; //ENTER API KEY HERE
+
+    var endpoint = 'http://www.omdbapi.com/?s=' + movie +'&apikey=d1acfc3f';
+    
+    request.get(endpoint, (error, response, body) => {
+        if(response.statusCode !== 200) {
+            this.emit(':tell','There was an error processing your request. Here\'s what happened: ' +
+                                response.statusCode + ' ' + response.statusMessage);
+        } else {
+          data = JSON.parse(body);
+
+          var awards = data.Awards;
+
+          this.emit(':ask', awards);
+        }
+    });
+  },
+  'AMAZON.Calendar':function () {
+    this.emit(':tell', movie + 'has been added to your calendar, please confirm');
+  },
+  'AMAZON.YesIntent': function () {
+    nextMoviePosition = this.attributes['NextMovie'];
+    movieObject = this.attributes['MultipleMovies']['nextMoviePosition'];
+    this.emit(':ask', 'What would you like to know about' + movie);
+  },
+  'AMAZON.NoIntent': function () {
+    this.attributes['NextMovie']=this.attributes['NextMovie']+1;
+    this.emit(':ask', 'Alright, lets continue!')
+  },
+  'AMAZON.StopIntent': function () {
+    this.emit(':tell', `Goodbye.`);
+  },
+  'AMAZON.CancelIntent': function () {
+    this.emit(':tell', `Goodbye.`);
+  },
+  'SessionEndedRequest': function () {
+    this.emit(':saveState', true);
+  },
+
+  'AMAZON.HelpIntent' : function () {
+    this.emit(':ask', `You can tell me the name of a movie and I will say it back to you.  Who would you like me to find?`,  `Who would you like me to find?`);
+  },
+  'Unhandled' : function () {
+    this.emit(':ask', `You can tell me the name of a movie and I will say it back to you.  Who would you like me to find?`,  `Who would you like me to find?`);
+  }
+
+};
